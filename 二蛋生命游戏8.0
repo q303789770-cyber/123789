@@ -1,3 +1,211 @@
+// Visual Constants
+export const CELL_SIZE = 20; // Base size of a cell in pixels at zoom 1.0
+
+// Colors
+export const BG_COLOR = '#ffffff';
+export const LIVE_CELL_COLOR = '#000000';
+
+// Grid Line Colors (Tailwind-like grays)
+export const GRID_COLOR_L1 = '#e5e7eb'; // Level 1 (1x1) - Lightest
+export const GRID_COLOR_L2 = '#9ca3af'; // Level 2 (10x10) - Medium
+export const GRID_COLOR_L3 = '#4b5563'; // Level 3 (100x100) - Darkest
+
+// Simulation
+export const SIMULATION_SPEED_MS = 100;
+export const REPLAY_SPEED_MS = 600; // 慢动作回放速度
+
+// Zoom Constraints
+export const MIN_ZOOM = 0.02; // Can zoom out very far
+export const MAX_ZOOM = 5.0;  // Can zoom in closely
+
+// Visibility Thresholds
+// "Upward slide to shrink... to 1/2 size... show Level 2"
+export const THRESHOLD_L1_HIDE = 0.2; // L1 grid disappears when zoom is below this (too dense)
+export const THRESHOLD_L2_SHOW = 0.5; // L2 grid appears when zoom is below 0.5 (1/2 size of original)
+export const THRESHOLD_L3_SHOW = 0.25; // L3 grid appears when zoom is below 0.25 (1/2 size of L2 appearance)
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="二蛋生命" />
+    <title>二蛋生命游戏8.0</title>
+    <link rel="manifest" href="/manifest.json" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      /* Hide scrollbar for cleaner look */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1; 
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #888; 
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #555; 
+      }
+      /* Prevent pull-to-refresh on mobile */
+      body {
+        overscroll-behavior-y: none;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.4",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.563.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body class="bg-gray-50 text-gray-900 font-sans antialiased overflow-hidden select-none">
+    <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App';
+
+const rootElement = document.getElementById('root');
+if (!rootElement) {
+  throw new Error("Could not find root element to mount to");
+}
+
+const root = ReactDOM.createRoot(rootElement);
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
+
+{
+  "name": "二蛋生命游戏8.0",
+  "description": "一个极简的交互式康威生命游戏实现。采用无限风格的网格，细胞根据经典的生物学规则进行演化。"
+}
+{
+  "name": "二蛋生命游戏8.0",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "lucide-react": "^0.563.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "typescript": "~5.8.2",
+    "vite": "^6.2.0"
+  }
+}
+
+<div align="center">
+<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+</div>
+
+# Run and deploy your AI Studio app
+
+This contains everything you need to run your app locally.
+
+View your app in AI Studio: https://ai.studio/apps/temp/3
+
+## Run Locally
+
+**Prerequisites:**  Node.js
+
+
+1. Install dependencies:
+   `npm install`
+2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+3. Run the app:
+   `npm run dev`
+
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false,
+    "module": "ESNext",
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "skipLibCheck": true,
+    "types": [
+      "node"
+    ],
+    "moduleResolution": "bundler",
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "allowJs": true,
+    "jsx": "react-jsx",
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    },
+    "allowImportingTsExtensions": true,
+    "noEmit": true
+  }
+}
+export type GridType = Set<string>;
+
+export interface Viewport {
+  offsetX: number;
+  offsetY: number;
+  zoom: number;
+}
+
+export interface GameState {
+  grid: GridType;
+  isRunning: boolean;
+  generation: number;
+}
+import path from 'path';
+import { defineConfig, loadEnv } from 'vite';
+import react from '@vitejs/plugin-react';
+
+export default defineConfig(({ mode }) => {
+    const env = loadEnv(mode, '.', '');
+    return {
+      // 新增 build 配置，明确输出目录
+      build: {
+        outDir: 'dist', // 这一行是关键
+      },
+      server: {
+        port: 3000,
+        host: '0.0.0.0',
+      },
+      plugins: [react()],
+      define: {
+        'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
+        'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)
+      },
+      resolve: {
+        alias: {
+          '@': path.resolve(__dirname, '.'),
+        }
+      }
+    };
+});
 GEMINI_API_KEY=PLACEHOLDER_API_KEY
 
 # Logs
@@ -584,207 +792,3 @@ function App() {
 }
 
 export default App;
-// Visual Constants
-export const CELL_SIZE = 20; // Base size of a cell in pixels at zoom 1.0
-
-// Colors
-export const BG_COLOR = '#ffffff';
-export const LIVE_CELL_COLOR = '#000000';
-
-// Grid Line Colors (Tailwind-like grays)
-export const GRID_COLOR_L1 = '#e5e7eb'; // Level 1 (1x1) - Lightest
-export const GRID_COLOR_L2 = '#9ca3af'; // Level 2 (10x10) - Medium
-export const GRID_COLOR_L3 = '#4b5563'; // Level 3 (100x100) - Darkest
-
-// Simulation
-export const SIMULATION_SPEED_MS = 100;
-export const REPLAY_SPEED_MS = 600; // 慢动作回放速度
-
-// Zoom Constraints
-export const MIN_ZOOM = 0.02; // Can zoom out very far
-export const MAX_ZOOM = 5.0;  // Can zoom in closely
-
-// Visibility Thresholds
-// "Upward slide to shrink... to 1/2 size... show Level 2"
-export const THRESHOLD_L1_HIDE = 0.2; // L1 grid disappears when zoom is below this (too dense)
-export const THRESHOLD_L2_SHOW = 0.5; // L2 grid appears when zoom is below 0.5 (1/2 size of original)
-export const THRESHOLD_L3_SHOW = 0.25; // L3 grid appears when zoom is below 0.25 (1/2 size of L2 appearance)
-<!DOCTYPE html>
-<html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <meta name="theme-color" content="#ffffff" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="二蛋生命" />
-    <title>二蛋生命游戏8.0</title>
-    <link rel="manifest" href="/manifest.json" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-      /* Hide scrollbar for cleaner look */
-      ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-      }
-      ::-webkit-scrollbar-track {
-        background: #f1f1f1; 
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #888; 
-        border-radius: 4px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #555; 
-      }
-      /* Prevent pull-to-refresh on mobile */
-      body {
-        overscroll-behavior-y: none;
-      }
-    </style>
-  <script type="importmap">
-{
-  "imports": {
-    "react": "https://esm.sh/react@^19.2.4",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
-    "react/": "https://esm.sh/react@^19.2.4/",
-    "lucide-react": "https://esm.sh/lucide-react@^0.563.0"
-  }
-}
-</script>
-<link rel="stylesheet" href="/index.css">
-</head>
-  <body class="bg-gray-50 text-gray-900 font-sans antialiased overflow-hidden select-none">
-    <div id="root"></div>
-  <script type="module" src="/index.tsx"></script>
-</body>
-</html>
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import App from './App';
-
-const rootElement = document.getElementById('root');
-if (!rootElement) {
-  throw new Error("Could not find root element to mount to");
-}
-
-const root = ReactDOM.createRoot(rootElement);
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
-
-{
-  "name": "二蛋生命游戏8.0",
-  "description": "一个极简的交互式康威生命游戏实现。采用无限风格的网格，细胞根据经典的生物学规则进行演化。"
-}
-{
-  "name": "二蛋生命游戏8.0",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
-    "lucide-react": "^0.563.0"
-  },
-  "devDependencies": {
-    "@types/node": "^22.14.0",
-    "@vitejs/plugin-react": "^5.0.0",
-    "typescript": "~5.8.2",
-    "vite": "^6.2.0"
-  }
-}
-
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
-
-# Run and deploy your AI Studio app
-
-This contains everything you need to run your app locally.
-
-View your app in AI Studio: https://ai.studio/apps/temp/3
-
-## Run Locally
-
-**Prerequisites:**  Node.js
-
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
-
-{
-  "compilerOptions": {
-    "target": "ES2022",
-    "experimentalDecorators": true,
-    "useDefineForClassFields": false,
-    "module": "ESNext",
-    "lib": [
-      "ES2022",
-      "DOM",
-      "DOM.Iterable"
-    ],
-    "skipLibCheck": true,
-    "types": [
-      "node"
-    ],
-    "moduleResolution": "bundler",
-    "isolatedModules": true,
-    "moduleDetection": "force",
-    "allowJs": true,
-    "jsx": "react-jsx",
-    "paths": {
-      "@/*": [
-        "./*"
-      ]
-    },
-    "allowImportingTsExtensions": true,
-    "noEmit": true
-  }
-}
-export type GridType = Set<string>;
-
-export interface Viewport {
-  offsetX: number;
-  offsetY: number;
-  zoom: number;
-}
-
-export interface GameState {
-  grid: GridType;
-  isRunning: boolean;
-  generation: number;
-}
-import path from 'path';
-import { defineConfig, loadEnv } from 'vite';
-import react from '@vitejs/plugin-react';
-
-export default defineConfig(({ mode }) => {
-    const env = loadEnv(mode, '.', '');
-    return {
-      server: {
-        port: 3000,
-        host: '0.0.0.0',
-      },
-      plugins: [react()],
-      define: {
-        'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-        'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)
-      },
-      resolve: {
-        alias: {
-          '@': path.resolve(__dirname, '.'),
-        }
-      }
-    };
-});
